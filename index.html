@@ -7,31 +7,36 @@
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
+  <!-- ゲームボード(9マス) -->
   <div id="board">
-    <div class="cell" data-index="0"></div>
-    <div class="cell" data-index="1"></div>
-    <div class="cell" data-index="2"></div>
-    <div class="cell" data-index="3"></div>
-    <div class="cell" data-index="4"></div>
-    <div class="cell" data-index="5"></div>
-    <div class="cell" data-index="6"></div>
-    <div class="cell" data-index="7"></div>
-    <div class="cell" data-index="8"></div>
+    <div class="cell" data-index="0" droppable="true"></div>
+    <div class="cell" data-index="1" droppable="true"></div>
+    <div class="cell" data-index="2" droppable="true"></div>
+    <div class="cell" data-index="3" droppable="true"></div>
+    <div class="cell" data-index="4" droppable="true"></div>
+    <div class="cell" data-index="5" droppable="true"></div>
+    <div class="cell" data-index="6" droppable="true"></div>
+    <div class="cell" data-index="7" droppable="true"></div>
+    <div class="cell" data-index="8" droppable="true"></div>
   </div>
 
-  <div id="info">
-    <p>現在のプレイヤー: <span id="currentPlayerInfo"></span></p>
-    <p>×のコマ残数: <span id="piecesXInfo"></span></p>
-    <p>○のコマ残数: <span id="piecesOInfo"></span></p>
-    <p>選択中のコマ(移動用): <span id="selectedPieceInfo">(なし)</span></p>
-    <p>選択中のサイズ: <span id="selectedSizeDisplay">(なし)</span></p>
-  </div>
+  <!-- 残りのコマ（各プレイヤー）。ドラッグ＆ドロップで盤に置ける -->
+  <div id="remaining">
+    <!-- ×プレイヤーの残りコマ -->
+    <div class="player-remaining" id="remaining-x">
+      <div class="player-title">×(水色)のコマ</div>
+      <div class="piece-container" id="pieceContainerX">
+        <!-- 後ほどJSで自動生成 -->
+      </div>
+    </div>
 
-  <!-- サイズ選択ボタン -->
-  <div id="sizeButtons">
-    <button class="sizeButton" data-size="L">L</button>
-    <button class="sizeButton" data-size="M">M</button>
-    <button class="sizeButton" data-size="S">S</button>
+    <!-- ○プレイヤーの残りコマ -->
+    <div class="player-remaining" id="remaining-o">
+      <div class="player-title">○(オレンジ)のコマ</div>
+      <div class="piece-container" id="pieceContainerO">
+        <!-- 後ほどJSで自動生成 -->
+      </div>
+    </div>
   </div>
 
   <script src="./js/script.js"></script>
