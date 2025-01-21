@@ -7,7 +7,7 @@ body {
   height: 100vh;
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
+  background-color: #f9f9f9
 }
 
 /* 現在のプレイヤー表示のスタイル */
@@ -63,6 +63,7 @@ body {
 /* ボード下段(7,8,9番目のセル)からはオレンジを消す */
 .cell:nth-of-type(n + 7)::before {
   background-color: #f9f9f9;
+  z-index: 2;
 }
 /* 3列目(3n番目)からは水色を消す */
 .cell:nth-of-type(3n)::after {
