@@ -1,51 +1,4 @@
-const boardElement = document.getElementById('board');
-const cellElements = Array.from(document.querySelectorAll('.cell'));
-
-const currentPlayerInfo = document.getElementById(`currentPlayerInfo`);
-const piecesXInfo = document.getElementById(`piecesXInfo`);
-const piecesOInfo = document.getElementById(`piecesOInfo`);
-const selectedPieceInfo = document.getElementById(`selectedPieceInfo`);
-
-/**
- * 各セルはスタック構造でコマを管理
- * 上に行くほど末尾の配列要素
- * 例：board[0] = [{ player: 'x', size: 'S' }, { player: 'o', size: 'M' }]
- */
-let board = Array(9).fill(null).map(() => []);
-
-/**
- * 各プレイヤーのコマ残数
- */
-let pieces = {
-    'x': { 'L': 2, 'M': 2, 'S': 2},
-    'o': { 'L': 2, 'M': 2, 'S': 2}
-};
-
-let currentPlayer = 'x';
-
-/**
- * プレイヤーが「移動したい（または被せたい）コマ」を選択中かどうか。
- * {cellIndex, pieceData}のように保持
- */
-let selectedPiece = null;
-
-updateDisplay();
-
-boardElement.addEventListener('click', (e) => {
-    const cell = e.target;
-    const index = parseInt(cell.dataset.index, 10);
-
-    if (isNaN(index)) return;
-
-    if (selectedPiece) {
-        movePiece(selectedPiece, index);
-        selectedPiece = null;
-        selectedPieceInfo.textContent = '(なし)'
-        endTurn();
-        return;
-    }
-
-/* script.js: 三目並べに大中小コマを導入した例 */
+/* script.js */
 const boardElement = document.getElementById('board');
 const cellElements = Array.from(document.querySelectorAll('.cell'));
 
@@ -53,15 +6,18 @@ const currentPlayerInfo = document.getElementById('currentPlayerInfo');
 const piecesXInfo = document.getElementById('piecesXInfo');
 const piecesOInfo = document.getElementById('piecesOInfo');
 const selectedPieceInfo = document.getElementById('selectedPieceInfo');
+const selectedSizeDisplay = document.getElementById('selectedSizeDisplay');
+
+// サイズボタンの要素を取得
+const sizeButtons = document.querySelectorAll('.sizeButton');
 
 /**
- * 各セルはスタック構造（上に行くほど末尾の配列要素）でコマを管理
- * 例: board[0] = [{ player: '×', size: 'S' }, { player: '○', size: 'M' }]
+ * 各セル: スタック(配列)でコマを管理
  */
 let board = Array(9).fill(null).map(() => []);
 
 /**
- * 各プレイヤーのコマ残数(大: L, 中: M, 小: S)それぞれ2個
+ * 各プレイヤーが持つコマの数
  */
 let pieces = {
   '×': { 'L': 2, 'M': 2, 'S': 2 },
@@ -69,46 +25,58 @@ let pieces = {
 };
 
 /**
- * 現在のプレイヤー ('×' or '○')
+ * 現在のプレイヤー('×' or '○')
  */
 let currentPlayer = '×';
 
 /**
- * プレイヤーが「移動したい(または被せたい)コマ」を選択中かどうか。
- * 選択した場合、{ cellIndex, pieceData } のように保持する。
+ * プレイヤーが移動したいコマを選択中の場合、その情報を保持
+ * (cellIndex, pieceData)
  */
 let selectedPiece = null;
+
+/**
+ * ボタンで選択したコマの大きさ (L, M, Sのいずれか or null)
+ */
+let selectedSize = null;
 
 /**
  * 初期表示
  */
 updateDisplay();
 
+/**
+ * 各サイズボタンにクリックイベントを登録して、selectedSizeを変更
+ */
+sizeButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const size = button.dataset.size; // "L" / "M" / "S"
+    selectedSize = size;
+    selectedSizeDisplay.textContent = size;
+  });
+});
+
+/**
+ * ボード(セル)をクリックしたときの処理
+ */
 boardElement.addEventListener('click', (e) => {
   const cell = e.target;
   const index = parseInt(cell.dataset.index, 10);
-
-  // クリック対象がセルでなければ無視
   if (isNaN(index)) return;
 
-  // 既に"移動・被せ"したいコマを選択している場合
+  // もし既に「移動モード」でコマを選択しているなら、移動先にコマを置く
   if (selectedPiece) {
-    // (A) 現在選択中のコマをここ(index)に置く処理
     moveOrStackPiece(selectedPiece, index);
     selectedPiece = null;
     selectedPieceInfo.textContent = '(なし)';
-    // ターン終了し、勝敗判定へ
-    endTurn();
+    endTurn(); // ターン終了
     return;
   }
 
-  // まだコマを選択していない場合、
-  // 1) 新規にコマを置くか(手持ちのコマを設置)
-  // 2) 既に置いてあるコマを選択(移動用)するか
-  // の判断を行う
-
-  // もしセルの一番上にあるコマが自分のものなら、それを選択して移動するモードにする
+  // 移動モードでない場合は……
   const topPiece = getTopPiece(index);
+
+  // (1) クリックしたセルの最上段が自分のコマなら、それを選択して「移動モード」に入る
   if (topPiece && topPiece.player === currentPlayer) {
     // 移動選択
     selectedPiece = {
@@ -116,55 +84,36 @@ boardElement.addEventListener('click', (e) => {
       pieceData: topPiece
     };
     selectedPieceInfo.textContent = 
-      `${index}番セルの(${topPiece.player}, ${topPiece.size})を選択中`;
+      `${index}番セル(${topPiece.player}, ${topPiece.size})を選択中`;
   } else {
-    // 手持ちのコマがあれば、新規に置くこともできる
-    // ここでは仮にサイズを選ぶUIを用意していないので、強制的に小コマを置く例を示す
-    // 実際はUIで選ばせたり、順番に置かせたりするなど調整してください。
-    const placeSize = findAvailableSize(currentPlayer);
-    if (!placeSize) {
-      alert("もう置けるコマがありません。移動してください。");
+    // (2) 新規配置(手持ちコマがあれば置ける)
+    if (!selectedSize) {
+      alert("まずはコマのサイズ(L/M/S)を選択してください。");
       return;
     }
+
+    // 手持ちが残っているか確認
+    if (pieces[currentPlayer][selectedSize] <= 0) {
+      alert(`大きさ「${selectedSize}」の手持ちコマはもうありません!`);
+      return;
+    }
+
     // 新規配置
-    placeNewPiece(currentPlayer, placeSize, index);
-    // ターン終了し、勝敗判定へ
-    endTurn();
+    placeNewPiece(currentPlayer, selectedSize, index);
+    endTurn(); // ターン終了
   }
 });
-
-/**
- * 手持ちのコマがまだ残っているサイズを1つ返す(例としてS->M->Lの順で探す)
- */
-function findAvailableSize(player) {
-  if (pieces[player].S > 0) return 'S';
-  if (pieces[player].M > 0) return 'M';
-  if (pieces[player].L > 0) return 'L';
-  return null;
-}
 
 /**
  * 新しいコマをボードに置く
  */
 function placeNewPiece(player, size, index) {
   board[index].push({ player, size });
-  pieces[player][size] -= 1; // 手持ちを減らす
+  pieces[player][size] -= 1; // 手持ちを1つ減らす
 }
 
 /**
- * 選択中のコマを取り出して、別のセルに被せる/移動する
- */
-function moveOrStackPiece(selected, newIndex) {
-  const { cellIndex, pieceData } = selected;
-  // 元のセルからコマを削除(最上段にあるコマしか動かせない前提)
-  board[cellIndex].pop();
-
-  // 新しいセルに積む
-  board[newIndex].push(pieceData);
-}
-
-/**
- * index番目セルの一番上のコマ情報を返す (なければnull)
+ * index番セルの一番上のコマを返す(なければnull)
  */
 function getTopPiece(index) {
   const stack = board[index];
@@ -173,19 +122,30 @@ function getTopPiece(index) {
 }
 
 /**
- * ターン終了処理
+ * 「移動モード」で選択中のコマを別のセルへ移動する
+ */
+function moveOrStackPiece(selected, newIndex) {
+  const { cellIndex, pieceData } = selected;
+  // 元セルから取り除く(最上段のみ)
+  board[cellIndex].pop();
+  // 新セルに追加
+  board[newIndex].push(pieceData);
+}
+
+/**
+ * ターン終了処理: 画面更新, 勝敗チェック, プレイヤー交代
  */
 function endTurn() {
   renderBoard();
   if (checkWinner(currentPlayer)) {
     setTimeout(() => {
-      alert(currentPlayer + 'が勝ちました！');
+      alert(currentPlayer + 'が勝ちました!');
       resetGame();
     }, 10);
     return;
   }
 
-  // 全セル埋まっており、かつ誰も勝っていないなら引き分け
+  // 全セルが埋まっていて勝者なし→引き分け
   if (board.every(stack => stack.length > 0)) {
     setTimeout(() => {
       alert('引き分けです。');
@@ -195,26 +155,22 @@ function endTurn() {
   }
 
   // プレイヤー交代
-  currentPlayer = currentPlayer === '×' ? '○' : '×';
+  currentPlayer = (currentPlayer === '×') ? '○' : '×';
   updateDisplay();
 }
 
 /**
- * ボードをHTMLに反映
+ * 盤面の表示更新
  */
 function renderBoard() {
   cellElements.forEach((cell, i) => {
     const topPiece = getTopPiece(i);
-    if (topPiece) {
-      cell.textContent = topPiece.player + topPiece.size;
-    } else {
-      cell.textContent = '';
-    }
+    cell.textContent = topPiece ? (topPiece.player + topPiece.size) : '';
   });
 }
 
 /**
- * 画面の各種情報を更新
+ * スコア等の表示更新
  */
 function updateDisplay() {
   currentPlayerInfo.textContent = currentPlayer;
@@ -222,11 +178,13 @@ function updateDisplay() {
     `L:${pieces['×'].L}, M:${pieces['×'].M}, S:${pieces['×'].S}`;
   piecesOInfo.textContent = 
     `L:${pieces['○'].L}, M:${pieces['○'].M}, S:${pieces['○'].S}`;
+  selectedPieceInfo.textContent = '(なし)';
+  selectedSizeDisplay.textContent = selectedSize ? selectedSize : '(なし)';
   renderBoard();
 }
 
 /**
- * 勝利判定。各セルの「一番上のコマのplayer」が3つ揃っているかをチェック
+ * 勝利判定
  */
 function checkWinner(player) {
   const winPatterns = [
@@ -243,10 +201,9 @@ function checkWinner(player) {
 }
 
 /**
- * ゲームリセット処理(必要に応じて呼び出す)
+ * ゲームリセット
  */
 function resetGame() {
-  // 初期化
   board = Array(9).fill(null).map(() => []);
   pieces = {
     '×': { 'L': 2, 'M': 2, 'S': 2 },
@@ -254,5 +211,6 @@ function resetGame() {
   };
   currentPlayer = '×';
   selectedPiece = null;
+  selectedSize = null;
   updateDisplay();
 }
