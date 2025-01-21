@@ -1,30 +1,39 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>三目並べ</title>
-    <link rel="stylesheet" href="./css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>三目並べ（コマ大中小 + ボタン選択）</title>
+  <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <div id="board">
-        <div class="cell" data-index="0"></div>
-        <div class="cell" data-index="1"></div>
-        <div class="cell" data-index="2"></div>
-        <div class="cell" data-index="3"></div>
-        <div class="cell" data-index="4"></div>
-        <div class="cell" data-index="5"></div>
-        <div class="cell" data-index="6"></div>
-        <div class="cell" data-index="7"></div>
-        <div class="cell" data-index="8"></div>
-    </div>
+  <div id="board">
+    <div class="cell" data-index="0"></div>
+    <div class="cell" data-index="1"></div>
+    <div class="cell" data-index="2"></div>
+    <div class="cell" data-index="3"></div>
+    <div class="cell" data-index="4"></div>
+    <div class="cell" data-index="5"></div>
+    <div class="cell" data-index="6"></div>
+    <div class="cell" data-index="7"></div>
+    <div class="cell" data-index="8"></div>
+  </div>
 
-    <div id="info">
-        <p>現在のプレイヤー: <span id="currentPlayerInfo"></span></p>
-        <p>×のコマ残数: <span id="piecesXInfo"></span></p>
-        <p>○のコマ残数: <span id="piecesOInfo"></span></p>
-        <p>選択中のコマ: <span id="selectedPieceInfo">(なし)</span></p>
-    </div>
-    <script src="./js/script.js"></script>
+  <div id="info">
+    <p>現在のプレイヤー: <span id="currentPlayerInfo"></span></p>
+    <p>×のコマ残数: <span id="piecesXInfo"></span></p>
+    <p>○のコマ残数: <span id="piecesOInfo"></span></p>
+    <p>選択中のコマ(移動用): <span id="selectedPieceInfo">(なし)</span></p>
+    <p>選択中のサイズ: <span id="selectedSizeDisplay">(なし)</span></p>
+  </div>
+
+  <!-- サイズ選択ボタンを用意 -->
+  <div id="sizeButtons">
+    <button class="sizeButton" data-size="L">L</button>
+    <button class="sizeButton" data-size="M">M</button>
+    <button class="sizeButton" data-size="S">S</button>
+  </div>
+
+  <script src="./js/script.js"></script>
 </body>
 </html>
