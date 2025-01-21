@@ -1,11 +1,63 @@
 const boardElement = document.getElementById('board');
-const cells = Array.from(document.querySelectorAll('.cell'));
-let currentPlayer = '×';
-let board = Array(9).fill(null);
+const cellElements = Array.from(document.querySelectorAll('.cell'));
+
+const currentPlayerInfo = document.getElementById(`currentPlayerInfo`);
+const piecesXInfo = document.getElementById(`piecesXInfo`);
+const piecesOInfo = document.getElementById(`piecesOInfo`);
+const selectedPieceInfo = document.getElementById(`selectedPieceInfo`);
+
+/**
+ * 各セルはスタック構造でコマを管理
+ * 上に行くほど末尾の配列要素
+ * 例：board[0] = [{ player: 'x', size: 'S' }, { player: 'o', size: 'M' }]
+ */
+let board = Array(9).fill(null).map(() => []);
+
+/**
+ * 各プレイヤーのコマ残数
+ */
+let pieces = {
+    'x': { 'L': 2, 'M': 2, 'S': 2},
+    'o': { 'L': 2, 'M': 2, 'S': 2}
+};
+
+let currentPlayer = 'x';
+
+/**
+ * プレイヤーが「移動したい（または被せたい）コマ」を選択中かどうか。
+ * {cellIndex, pieceData}のように保持
+ */
+let selectedPiece = null;
+
+updateDisplay();
 
 boardElement.addEventListener('click', (e) => {
-    const target = e.target;
-    const index = target.dataset.index;
+    const cell = e.target;
+    const index = parseInt(cell.dataset.index, 10);
+
+    if (isNaN(index)) return;
+
+    if (selectedPiece) {
+        movePiece(selectedPiece, index);
+        selectedPiece = null;
+        selectedPieceInfo.textContent = '(なし)'
+        endTurn();
+        return;
+    }
+
+    // まだコマを選択していない場合
+    // 1. 新規にコマを置くか（手持ちのコマを設置）
+    // 2. 既に置いてあるコマを選択するか
+
+    //もしセルの一番上にあるコマが自分のものならそれを選択して移動モード
+    const topPiece = getTopPiece(index);
+    if (topPiece && topPiece.player === currentPlayer) {
+        selectedPiece = {
+            cellIndex: index,
+            pieceData: topPiece
+        };
+        
+    }
     
     if (index !== undefined && board[index] === null) {
         board[index] = currentPlayer;
@@ -17,7 +69,7 @@ boardElement.addEventListener('click', (e) => {
             setTimeout(() => alert('引き分けです。'), 1)
         }
     }
-    setTimeout(() => currentPlayer = currentPlayer === '×' ? '○' : '×', 5);
+    setTimeout(() => currentPlayer = currentPlayer === 'x' ? 'o' : 'x', 5);
 });
 
 function checWinner(player) {
