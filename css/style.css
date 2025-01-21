@@ -1,0 +1,54 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+}
+#board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    background-color: white;
+}
+.cell {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    cursor: pointer;
+    user-select: none;
+}
+.cell::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background-color: orange;
+    z-index: 0;
+}
+.cell::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 100%;
+    background-color: lightblue;
+    z-index: 1;
+}
+.cell:hover {
+    background-color: #f9f9f9;
+}
+.cell:nth-of-type(n+7)::before {
+    background-color: #f9f9f9;
+    z-index: 2;
+}
+.cell:nth-of-type(3n)::after {
+    background-color: #f9f9f9;
+}
