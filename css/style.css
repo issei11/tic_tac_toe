@@ -7,21 +7,38 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f9f9f9;
 }
+/* 1セルあたり実際は100×100だが、右30px & 下30px分を枠線に使用 */
 #board {
     display: grid;
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(3, 100px);
     background-color: white;
 }
+
+/* ここを修正 */
 .cell {
     position: relative;
+    /* 従来のセルサイズを確保しつつ、右と下に30pxパディング →
+       (100 - 30)×(100 - 30) =70×70が「実質的な表示領域」に */
+    padding-right: 30px;
+    padding-bottom: 30px;
+    box-sizing: border-box; 
+    
+    /* flexで中央揃え */
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2em;
+    
+    /* 枠線用のbefore/afterより上に表示させるためz-indexを高めに */
+    z-index: 2;
+    
+    /* 文字の大きさを少しアップ */
+    font-size: 2.5em;
     cursor: pointer;
     user-select: none;
 }
+
+/* 以下、枠線用の疑似要素 */
 .cell::before {
     content: "";
     position: absolute;
@@ -42,16 +59,23 @@ body {
     background-color: lightblue;
     z-index: 1;
 }
+
+/* ホバー時の色 */
 .cell:hover {
     background-color: #f9f9f9;
 }
+
+/* 一番下の行(セル番号7～9相当)では下側のオレンジは表示しないイメージ */
 .cell:nth-of-type(n+7)::before {
     background-color: #f9f9f9;
-    z-index: 2;
+    z-index: 2; 
 }
+/* 3列目(セル番号3の倍数)では右側の青を消す */
 .cell:nth-of-type(3n)::after {
     background-color: #f9f9f9;
 }
+
+/* サイズボタンはそのまま */
 #sizeButtons {
   margin-top: 10px;
 }
