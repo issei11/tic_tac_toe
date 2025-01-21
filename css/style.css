@@ -1,87 +1,129 @@
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-}
-/* 1セルあたり実際は100×100だが、右30px & 下30px分を枠線に使用 */
-#board {
-    display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-template-rows: repeat(3, 100px);
-    background-color: white;
-}
+/* 画面全体をセンタリング */
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
 
-/* ここを修正 */
-.cell {
-    position: relative;
-    /* 従来のセルサイズを確保しつつ、右と下に30pxパディング →
-       (100 - 30)×(100 - 30) =70×70が「実質的な表示領域」に */
-    padding-right: 30px;
-    padding-bottom: 30px;
-    box-sizing: border-box; 
-    
-    /* flexで中央揃え */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    /* 枠線用のbefore/afterより上に表示させるためz-indexを高めに */
-    z-index: 2;
-    
-    /* 文字の大きさを少しアップ */
-    font-size: 2.5em;
-    cursor: pointer;
-    user-select: none;
-}
+    /* 大きくしたボード: 各セル200×200 */
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 200px);
+      grid-template-rows: repeat(3, 200px);
+      background-color: white;
+      position: relative;
+    }
 
-/* 以下、枠線用の疑似要素 */
-.cell::before {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 30px;
-    background-color: orange;
-    z-index: 0;
-}
-.cell::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 30px;
-    height: 100%;
-    background-color: lightblue;
-    z-index: 1;
-}
+    /* 枠線用のbefore/afterを使う形を踏襲する */
+    .cell {
+      position: relative;
+      /* 枠30px + 有効エリア170px相当（ただし拡大しているので要調整） */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      overflow: hidden; /* ドラッグ要素がはみ出さないように一応設定 */
+      z-index: 2;       /* 枠より前面に表示させる */
+    }
+    .cell::before {
+      /* 下側のオレンジ枠 */
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 30px;
+      background-color: orange;
+      z-index: 0;
+    }
+    .cell::after {
+      /* 右側の水色枠 */
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 30px;
+      height: 100%;
+      background-color: lightblue;
+      z-index: 1;
+    }
+    .cell:hover {
+      background-color: #f1f1f1;
+    }
+    /* 最下段(7,8,9番目セル)はオレンジの下枠を消す */
+    .cell:nth-of-type(n+7)::before {
+      background-color: #f9f9f9;
+    }
+    /* 3列目(3,6,9番目セル)は水色の右枠を消す */
+    .cell:nth-of-type(3n)::after {
+      background-color: #f9f9f9;
+    }
 
-/* ホバー時の色 */
-.cell:hover {
-    background-color: #f9f9f9;
-}
+    /* 残りのコマ(手持ち)を並べるエリア */
+    #remaining {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .player-remaining {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .player-title {
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .piece-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-/* 一番下の行(セル番号7～9相当)では下側のオレンジは表示しないイメージ */
-.cell:nth-of-type(n+7)::before {
-    background-color: #f9f9f9;
-    z-index: 2; 
-}
-/* 3列目(セル番号3の倍数)では右側の青を消す */
-.cell:nth-of-type(3n)::after {
-    background-color: #f9f9f9;
-}
+    /* コマ(●)のスタイル: L, M, S */
+    .piece {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 80px;  /* Lサイズの枠として使う */
+      height: 80px;
+      cursor: grab;
+      user-select: none;
+    }
+    /* ドラッグ中の見た目 */
+    .piece:active {
+      cursor: grabbing;
+    }
 
-/* サイズボタンはそのまま */
-#sizeButtons {
-  margin-top: 10px;
-}
-.sizeButton {
-  margin: 0 5px;
-  padding: 8px 16px;
-  font-size: 1rem;
-  cursor: pointer;
-}
+    /* ×プレイヤーは水色, ○プレイヤーはオレンジ */
+    .piece.x-L, .piece.x-M, .piece.x-S {
+      color: lightblue;
+    }
+    .piece.o-L, .piece.o-M, .piece.o-S {
+      color: orange;
+    }
+
+    /* L, M, S の大きさ (ここでは縦横の最大枠を基準に ● のフォントサイズを変えて実現) 
+       - L = ほぼいっぱい -> 4/4
+       - M = その半分       -> 2/4
+       - S = さらに半分     -> 1/4
+    */
+    .piece.x-L, .piece.o-L {
+      font-size: 80px; /* 枠、ほぼいっぱい */
+    }
+    .piece.x-M, .piece.o-M {
+      font-size: 40px; /* ちょうど半分 */
+    }
+    .piece.x-S, .piece.o-S {
+      font-size: 20px; /* その半分 */
+    }
