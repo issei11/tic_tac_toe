@@ -1,44 +1,36 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>三目並べ（●の色と大きさで表現）</title>
-  <link rel="stylesheet" href="./css/style.css" />
-</head>
-<body>
-  <!-- ゲームボード(9マス) -->
-  <div id="board">
-    <div class="cell" data-index="0" droppable="true"></div>
-    <div class="cell" data-index="1" droppable="true"></div>
-    <div class="cell" data-index="2" droppable="true"></div>
-    <div class="cell" data-index="3" droppable="true"></div>
-    <div class="cell" data-index="4" droppable="true"></div>
-    <div class="cell" data-index="5" droppable="true"></div>
-    <div class="cell" data-index="6" droppable="true"></div>
-    <div class="cell" data-index="7" droppable="true"></div>
-    <div class="cell" data-index="8" droppable="true"></div>
-  </div>
-
-  <!-- 残りのコマ（各プレイヤー）。ドラッグ＆ドロップで盤に置ける -->
-  <div id="remaining">
-    <!-- ×プレイヤーの残りコマ -->
-    <div class="player-remaining" id="remaining-x">
-      <div class="player-title">×(水色)のコマ</div>
-      <div class="piece-container" id="pieceContainerX">
-        <!-- 後ほどJSで自動生成 -->
+  <head>
+    <meta charset="UTF-8" />
+    <title>変形三目並べ</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <!-- 現在のプレイヤー表示 -->
+    <div id="current-player" class="player-display"></div>
+    <!-- ゲームボード(9マス) -->
+    <div id="board">
+      <div class="cell" data-index="0"></div>
+      <div class="cell" data-index="1"></div>
+      <div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div>
+      <div class="cell" data-index="4"></div>
+      <div class="cell" data-index="5"></div>
+      <div class="cell" data-index="6"></div>
+      <div class="cell" data-index="7"></div>
+      <div class="cell" data-index="8"></div>
+    </div>
+    <!-- 残りのコマ -->
+    <div id="remaining">
+      <div class="player-remaining">
+        <div class="player-title">水色</div>
+        <div class="piece-container" id="pieceContainerX"></div>
+      </div>
+      <div class="player-remaining">
+        <div class="player-title">オレンジ</div>
+        <div class="piece-container" id="pieceContainerO"></div>
       </div>
     </div>
-
-    <!-- ○プレイヤーの残りコマ -->
-    <div class="player-remaining" id="remaining-o">
-      <div class="player-title">○(オレンジ)のコマ</div>
-      <div class="piece-container" id="pieceContainerO">
-        <!-- 後ほどJSで自動生成 -->
-      </div>
-    </div>
-  </div>
-
-  <script src="./js/script.js"></script>
-</body>
+    <script src="./js/script.js"></script>
+  </body>
 </html>
