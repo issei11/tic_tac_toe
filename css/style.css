@@ -1,129 +1,139 @@
 /* 画面全体をセンタリング */
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-    }
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+}
 
-    /* 大きくしたボード: 各セル200×200 */
-    #board {
-      display: grid;
-      grid-template-columns: repeat(3, 200px);
-      grid-template-rows: repeat(3, 200px);
-      background-color: white;
-      position: relative;
-    }
+/* 現在のプレイヤー表示のスタイル */
+.player-display {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
 
-    /* 枠線用のbefore/afterを使う形を踏襲する */
-    .cell {
-      position: relative;
-      /* 枠30px + 有効エリア170px相当（ただし拡大しているので要調整） */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      user-select: none;
-      overflow: hidden; /* ドラッグ要素がはみ出さないように一応設定 */
-      z-index: 2;       /* 枠より前面に表示させる */
-    }
-    .cell::before {
-      /* 下側のオレンジ枠 */
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 30px;
-      background-color: orange;
-      z-index: 0;
-    }
-    .cell::after {
-      /* 右側の水色枠 */
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 30px;
-      height: 100%;
-      background-color: lightblue;
-      z-index: 1;
-    }
-    .cell:hover {
-      background-color: #f1f1f1;
-    }
-    /* 最下段(7,8,9番目セル)はオレンジの下枠を消す */
-    .cell:nth-of-type(n+7)::before {
-      background-color: #f9f9f9;
-    }
-    /* 3列目(3,6,9番目セル)は水色の右枠を消す */
-    .cell:nth-of-type(3n)::after {
-      background-color: #f9f9f9;
-    }
+/* 大きいボード：各セルは 200×200 */
+#board {
+  display: grid;
+  grid-template-columns: repeat(3, 200px);
+  grid-template-rows: repeat(3, 200px);
+  background-color: white;
+  position: relative;
+}
 
-    /* 残りのコマ(手持ち)を並べるエリア */
-    #remaining {
-      display: flex;
-      gap: 20px;
-      margin-top: 20px;
-    }
-    .player-remaining {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 8px;
-      background: #fff;
-    }
-    .player-title {
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-    .piece-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+/* セル */
+.cell {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+  z-index: 2;
+}
 
-    /* コマ(●)のスタイル: L, M, S */
-    .piece {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 80px;  /* Lサイズの枠として使う */
-      height: 80px;
-      cursor: grab;
-      user-select: none;
-    }
-    /* ドラッグ中の見た目 */
-    .piece:active {
-      cursor: grabbing;
-    }
+/* 擬似要素で下枠(橙)と右枠(水色)を描く */
+.cell::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background-color: orange;
+  z-index: 0;
+}
+.cell::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 100%;
+  background-color: lightblue;
+  z-index: 1;
+}
 
-    /* ×プレイヤーは水色, ○プレイヤーはオレンジ */
-    .piece.x-L, .piece.x-M, .piece.x-S {
-      color: lightblue;
-    }
-    .piece.o-L, .piece.o-M, .piece.o-S {
-      color: orange;
-    }
+/* ボード下段(7,8,9番目のセル)からはオレンジを消す */
+.cell:nth-of-type(n + 7)::before {
+  background-color: #f9f9f9;
+}
+/* 3列目(3n番目)からは水色を消す */
+.cell:nth-of-type(3n)::after {
+  background-color: #f9f9f9;
+}
 
-    /* L, M, S の大きさ (ここでは縦横の最大枠を基準に ● のフォントサイズを変えて実現) 
-       - L = ほぼいっぱい -> 4/4
-       - M = その半分       -> 2/4
-       - S = さらに半分     -> 1/4
-    */
-    .piece.x-L, .piece.o-L {
-      font-size: 80px; /* 枠、ほぼいっぱい */
-    }
-    .piece.x-M, .piece.o-M {
-      font-size: 40px; /* ちょうど半分 */
-    }
-    .piece.x-S, .piece.o-S {
-      font-size: 20px; /* その半分 */
-    }
+.cell:hover {
+  background-color: #f1f1f1;
+}
+
+/* 残りコマを表示するエリア */
+#remaining {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+.player-remaining {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+.player-title {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+.piece-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* 手元コマ(●) */
+.piece {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 80px;
+  cursor: grab;
+  user-select: none;
+}
+.piece:active {
+  cursor: grabbing;
+}
+
+/* x(プレイヤー×)=水色 / o(プレイヤー○)=オレンジ */
+.piece.x-L,
+.piece.x-M,
+.piece.x-S {
+  color: lightblue;
+}
+.piece.o-L,
+.piece.o-M,
+.piece.o-S {
+  color: orange;
+}
+
+/* L, M, S (4:2:1 のバランス) 手元表示 */
+.piece.x-L,
+.piece.o-L {
+  font-size: 80px;
+}
+.piece.x-M,
+.piece.o-M {
+  font-size: 40px;
+}
+.piece.x-S,
+.piece.o-S {
+  font-size: 20px;
+}
